@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tinta-archivo: #161817;
+  --papel-algodon: #F5F0E6;
+  --verde-organico: #1F362D;
+  --lacre-borgona: #6E2C28;
+  --bronce-antiguo: #B89352;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #161817;
+  color: #F5F0E6;
+}
+
+body {
+  font-family: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  background-color: #161817;
+  color: #F5F0E6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: #B89352;
+  color: #161817;
+}
+
+/* Textura sutil de papel oscuro y algodón mediante SVG noise en data URI */
+.paper-texture-dark {
+  background-image: radial-gradient(
+      circle at 50% 18%,
+      rgba(184, 147, 82, 0.1) 0%,
+      rgba(31, 54, 45, 0.08) 38%,
+      rgba(22, 24, 23, 0) 75%
+    ),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+.paper-texture-light {
+  background-image: radial-gradient(
+      circle at 50% 0%,
+      rgba(184, 147, 82, 0.08) 0%,
+      rgba(245, 240, 230, 0) 70%
+    ),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseLight'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseLight)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* Detalles de relojería silenciosa */
+.horology-ticks {
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(184, 147, 82, 0.35) 0px,
+    rgba(184, 147, 82, 0.35) 1px,
+    transparent 1px,
+    transparent 24px
+  );
+}
+

@@ -1,11 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDownRight, CalendarCheck, Compass, ScrollText } from "lucide-react";
+import { ArrowDownRight } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <section className="relative flex min-h-[calc(100vh-73px)] flex-col justify-between overflow-hidden border-b border-bronce-antiguo/30 bg-tinta-archivo paper-texture-dark">
+    <section className="relative flex min-h-screen flex-col justify-center overflow-hidden border-b border-bronce-antiguo/30 bg-tinta-archivo paper-texture-dark">
       {/* Líneas arquitectónicas verticales de relojería / archivo */}
       <div
         className="pointer-events-none absolute inset-0 mx-auto max-w-7xl border-x border-bronce-antiguo/10"
@@ -122,47 +122,6 @@ export default function HeroSection() {
             <span>Ver cómo funciona el pacto</span>
           </a>
         </motion.div>
-      </div>
-
-      {/* Cinta inferior de garantías del proceso */}
-      <div className="relative z-10 border-t border-bronce-antiguo/25 bg-tinta-archivo/95">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 divide-y divide-bronce-antiguo/20 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          <div className="flex items-center gap-3.5 px-6 py-4">
-            <Compass className="h-4 w-4 shrink-0 text-bronce-antiguo" />
-            <div className="text-left">
-              <p className="font-mono text-[11px] uppercase tracking-widest text-bronce-antiguo">
-                5 DESTINOS DE AUTOR
-              </p>
-              <p className="font-sans text-xs text-papel-algodon/75">
-                Ajusco · Valle de Bravo · Tepoztlán · CDMX
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3.5 px-6 py-4">
-            <ScrollText className="h-4 w-4 shrink-0 text-bronce-antiguo" />
-            <div className="text-left">
-              <p className="font-mono text-[11px] uppercase tracking-widest text-bronce-antiguo">
-                LINK DE INVITACIÓN Y HOJA EN RECEPCIÓN
-              </p>
-              <p className="font-sans text-xs text-papel-algodon/75">
-                Recibe tu link al confirmar y firmen su hoja al llegar al hotel
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3.5 px-6 py-4">
-            <CalendarCheck className="h-4 w-4 shrink-0 text-bronce-antiguo" />
-            <div className="text-left">
-              <p className="font-mono text-[11px] uppercase tracking-widest text-bronce-antiguo">
-                RESGUARDO Y BENEFICIO · FEB 2028
-              </p>
-              <p className="font-sans text-xs text-papel-algodon/75">
-                Guardamos su hoja; al regresar reciben 25% preferencial + brindis
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

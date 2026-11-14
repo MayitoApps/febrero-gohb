@@ -14,10 +14,18 @@ export interface Experience {
   imagen: string;
 }
 
+export interface PackingHints {
+  clima: string;
+  equipaje: string;
+  vibe: string;
+}
+
 export interface Hotel {
   slug: string;
   nombre: string;
   ubicacion: string;
+  direccionExacta: string;
+  googleMapsUrl: string;
   atmosfera: string;
   categoria: Exclude<FilterCategory, "Todos">;
   foliosDisponibles: number;
@@ -27,9 +35,11 @@ export interface Hotel {
   codigoArchivo: string;
   resumenEditorial: string;
   imagenPrincipal: string;
+  packingHints: PackingHints;
   experiencias: Experience[];
 }
 
+export const CONCIERGE_PIN = "ORGANICO2027";
 export const WHATSAPP_NUMBER = "525574555091";
 export const WHATSAPP_DISPLAY = "+52 55 7455 5091";
 
@@ -55,6 +65,9 @@ export const HOTELS: Hotel[] = [
     slug: "ajusco",
     nombre: "Ajusco",
     ubicacion: "Bosque del Ajusco, CDMX",
+    direccionExacta: "San Miguel Ajusco, Tlalpan, Ciudad de México, CDMX",
+    googleMapsUrl:
+      "https://maps.google.com/?q=Organico+Hotel+Boutique+Ajusco",
     atmosfera: "Bosque, Chimenea y Montaña",
     categoria: "Escapadas de Carretera",
     foliosDisponibles: 8,
@@ -65,6 +78,12 @@ export const HOTELS: Hotel[] = [
     resumenEditorial:
       "Un refugio de madera, piedra volcánica y neblina alta donde el crepitar de la leña reemplaza cualquier notificación. Diseñado para quienes buscan frío de montaña y calor de chimenea sin cruzar medio país.",
     imagenPrincipal: "/images/hoteles/ajusco-main.webp",
+    packingHints: {
+      clima: "Frío de montaña (6°C – 16°C)",
+      equipaje:
+        "Abrigo térmico, suéteres tejidos y calzado cómodo para bosque",
+      vibe: "Chimenea, neblina y desconexión total",
+    },
     experiencias: [
       {
         id: "ajusco-vigilia",
@@ -108,6 +127,10 @@ export const HOTELS: Hotel[] = [
     slug: "valle-de-bravo",
     nombre: "Valle de Bravo",
     ubicacion: "Valle de Bravo, Estado de México",
+    direccionExacta:
+      "Carretera del Manguito 121, 51200 Valle de Bravo, Estado de México",
+    googleMapsUrl:
+      "https://maps.google.com/?q=Carretera+del+Manguito+121,+Valle+de+Bravo",
     atmosfera: "Lago, Kayak y Pinos",
     categoria: "Escapadas de Carretera",
     foliosDisponibles: 6,
@@ -118,6 +141,11 @@ export const HOTELS: Hotel[] = [
     resumenEditorial:
       "Entre el espejo de agua al atardecer y la espesura de los pinos altos, el viento marca un compás distinto. Una propiedad concebida para mirar el horizonte sin prisa y dejar por escrito el regreso.",
     imagenPrincipal: "/images/hoteles/valle-main.webp",
+    packingHints: {
+      clima: "Templado fresco al atardecer (11°C – 22°C)",
+      equipaje: "Rompevientos ligero, lentes de sol y calzado cómodo",
+      vibe: "Atardecer en kayak y aire de pinos",
+    },
     experiencias: [
       {
         id: "valle-horizonte",
@@ -161,6 +189,10 @@ export const HOTELS: Hotel[] = [
     slug: "tepoztlan",
     nombre: "Tepoztlán",
     ubicacion: "Tepoztlán, Morelos",
+    direccionExacta:
+      "C. Netzahualcóyotl 47, Barrio de Santo Domingo, 62520 Tepoztlán, Mor.",
+    googleMapsUrl:
+      "https://maps.google.com/?q=C.+Netzahualc%C3%B3yotl+47,+Santo+Domingo,+62520+Tepoztl%C3%A1n,+Mor.",
     atmosfera: "Místico y Jardines",
     categoria: "Escapadas de Carretera",
     foliosDisponibles: 9,
@@ -171,6 +203,12 @@ export const HOTELS: Hotel[] = [
     resumenEditorial:
       "Al pie de los acantilados de piedra cobriza, jardines endémicos y silencio de montaña enmarcan una estancia contemplativa. El escenario ideal para convertir una promesa de pareja en un ritual tangible.",
     imagenPrincipal: "/images/hoteles/tepoztlan-main.jpg",
+    packingHints: {
+      clima: "Cálido de día, fresco de noche (14°C – 26°C)",
+      equipaje:
+        "Ropa fresca de lino o algodón, traje de baño y suéter ligero",
+      vibe: "Jardines, bienestar y calma mística",
+    },
     experiencias: [
       {
         id: "tepoztlan-ritual",
@@ -214,6 +252,10 @@ export const HOTELS: Hotel[] = [
     slug: "frontera-49",
     nombre: "Frontera 49",
     ubicacion: "Roma Norte, CDMX",
+    direccionExacta:
+      "Frontera 49, Roma Norte, Cuauhtémoc, 06700 Ciudad de México, CDMX",
+    googleMapsUrl:
+      "https://maps.google.com/?q=Frontera+49,+Roma+Nte.,+Cuauht%C3%A9moc,+06700+Ciudad+de+M%C3%A9xico,+CDMX",
     atmosfera: "Arquitectura y Barrio Urbano",
     categoria: "Experiencias en CDMX",
     foliosDisponibles: 7,
@@ -224,6 +266,12 @@ export const HOTELS: Hotel[] = [
     resumenEditorial:
       "Una casona de época restaurada con rigor contemporáneo en el corazón de la Roma Norte. Techos altos, diseño arquitectónico y mixología de autor para desaparecer del vértigo citadino sin salir de la ciudad.",
     imagenPrincipal: "/images/hoteles/frontera-main.png",
+    packingHints: {
+      clima: "Templado urbano (13°C – 23°C)",
+      equipaje:
+        "Estilo casual-elegante para caminar y cenar en la ciudad",
+      vibe: "Arquitectura, diseño y vida de barrio en la Roma",
+    },
     experiencias: [
       {
         id: "frontera-pausa",
@@ -248,6 +296,10 @@ export const HOTELS: Hotel[] = [
     slug: "quinta-soledad",
     nombre: "Centro Cultural Quinta Soledad",
     ubicacion: "Tlalpan, CDMX",
+    direccionExacta:
+      "Calle Moneda 15, Tlalpan Centro I, 14000 Ciudad de México, CDMX",
+    googleMapsUrl:
+      "https://maps.google.com/?q=Calle+Moneda+15,+Tlalpan+Centro+I,+14000+Ciudad+de+M%C3%A9xico,+CDMX",
     atmosfera: "Jardines Históricos y Arte",
     categoria: "Experiencias en CDMX",
     foliosDisponibles: 10,
@@ -258,6 +310,12 @@ export const HOTELS: Hotel[] = [
     resumenEditorial:
       "Un recinto patrimonial de árboles centenarios, salones de arte y jardines amurallados en el sur de la Ciudad de México. Alta gastronomía y solemnidad arquitectónica para celebrar sin salir de la capital.",
     imagenPrincipal: "/images/hoteles/quinta-main.png",
+    packingHints: {
+      clima: "Templado de jardín (14°C – 24°C)",
+      equipaje:
+        "Vestimenta smart-casual cómoda para jardín (evitar tacón de aguja)",
+      vibe: "Arte, historia y gastronomía al aire libre",
+    },
     experiencias: [
       {
         id: "quinta-velada",

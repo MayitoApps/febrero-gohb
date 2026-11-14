@@ -16,6 +16,10 @@ Escapar de la prisa del **12 al 14 de febrero de 2027** en cualquiera de las 5 p
 4. **Frontera 49** (`/hoteles/frontera-49`) — *Pausa Urbana de Autor*
 5. **Centro Cultural Quinta Soledad** (`/hoteles/quinta-soledad`) — *Velada en los Jardines del Tiempo* · *Banquete Dominical de los Pactos*
 
+## Invitaciones Digitales Personalizadas (Sin Base de Datos)
+- **Generador de Concierge (`/generador`):** Protegido con PIN configurable en `CONCIERGE_PIN` dentro de `src/data/hotels.ts` (por defecto `ORGANICO2027`), vista previa móvil en tiempo real, Modo Sorpresa (solo pistas de clima y equipaje) y envío directo por WhatsApp.
+- **Pagaré de Tiempo Digital (`/pase/[token]`):** Codificación UTF-8 Base64 URL-safe (`src/lib/passCodec.ts`), apertura animada sobre sello borgoña `GO`, mapa directo cuando no es sorpresa y descarga de evento en calendario `.ics` (`src/lib/calendarIcs.ts`).
+
 ## Comandos de Desarrollo y Producción
 
 ```bash

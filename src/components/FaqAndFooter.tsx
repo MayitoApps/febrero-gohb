@@ -11,7 +11,13 @@ import {
   buildConciergeWhatsAppUrl,
 } from "@/data/hotels";
 
-export default function FaqAndFooter() {
+interface FaqAndFooterProps {
+  showConciergeAccess?: boolean;
+}
+
+export default function FaqAndFooter({
+  showConciergeAccess = false,
+}: FaqAndFooterProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
@@ -175,7 +181,17 @@ export default function FaqAndFooter() {
               © {new Date().getFullYear()} GRUPO ORGÁNICO HOTELES BOUTIQUE.
               TODOS LOS DERECHOS RESERVADOS.
             </p>
-            <p>14.02.2027 ————————— 14.02.2028</p>
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:justify-end">
+              <p>14.02.2027 ————————— 14.02.2028</p>
+              {showConciergeAccess && (
+                <Link
+                  href="/generador"
+                  className="text-[10px] text-papel-algodon/35 transition-colors hover:text-bronce-antiguo"
+                >
+                  Acceso Concierge · Generador de Pases
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </footer>

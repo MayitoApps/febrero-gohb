@@ -1,10 +1,8 @@
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col bg-tinta-archivo text-papel-algodon paper-texture-dark">
-      <Navbar variant="property" />
       <main className="mx-auto flex max-w-2xl flex-1 flex-col items-center justify-center px-6 py-24 text-center">
         <span className="border border-lacre-borgona bg-lacre-borgona/25 px-3.5 py-1.5 font-mono text-xs uppercase tracking-widest text-papel-algodon">
           FOLIO NO LOCALIZADO · ERROR 404

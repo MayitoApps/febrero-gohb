@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Navbar from "@/components/Navbar";
 import FaqAndFooter from "@/components/FaqAndFooter";
 import HotelDetailClient from "@/components/HotelDetailClient";
 import { HOTELS, getHotelBySlug, getOtherHotels } from "@/data/hotels";
@@ -74,7 +73,6 @@ export default async function HotelDetailPage({ params }: HotelPageProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-tinta-archivo text-papel-algodon">
-      <Navbar variant="property" />
       <main className="flex-1">
         <HotelDetailClient hotel={hotel} otherHotels={otherHotels} />
       </main>

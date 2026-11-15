@@ -1,11 +1,11 @@
 # El Tiempo Que Nos Debemos · 14 de Febrero 2027
 **Grupo Orgánico Hoteles Boutique** — Plataforma Web de Campaña & Conversión (CRO)
 
-Aplicación web construida en **Next.js (App Router), TypeScript, Tailwind CSS y Framer Motion**.
+Aplicación web construida en **Next.js (App Router), TypeScript, Tailwind CSS, Framer Motion, Drizzle ORM y Neon Postgres**.
 
 ## Concepto de Campaña y Proceso
 Escapar de la prisa del **12 al 14 de febrero de 2027** en cualquiera de las 5 propiedades de Grupo Orgánico para vivir una experiencia privada:
-1. **Al confirmar su reserva:** Reciben un link con su invitación personalizada para ese día.
+1. **Al confirmar su reserva:** Reciben un link con su invitación digital personalizada para su estancia.
 2. **Al llegar el día de su reserva:** Firman en recepción su hoja personalizada, dejando pactada su cita para el próximo año.
 3. **Al regresar en febrero de 2028:** El hotel resguarda las hojas firmadas y, si regresan en febrero de 2028, reciben un **25% de tarifa preferencial y brindis de bienvenida**.
 
@@ -16,15 +16,18 @@ Escapar de la prisa del **12 al 14 de febrero de 2027** en cualquiera de las 5 p
 4. **Frontera 49** (`/hoteles/frontera-49`) — *Pausa Urbana de Autor*
 5. **Centro Cultural Quinta Soledad** (`/hoteles/quinta-soledad`) — *Velada en los Jardines del Tiempo* · *Banquete Dominical de los Pactos*
 
-## Invitaciones Digitales Personalizadas (Sin Base de Datos)
-- **Generador de Concierge (`/generador`):** Protegido con PIN configurable en `CONCIERGE_PIN` dentro de `src/data/hotels.ts` (por defecto `ORGANICO2027`), vista previa móvil en tiempo real, Modo Sorpresa (solo pistas de clima y equipaje) y envío directo por WhatsApp.
-- **Pagaré de Tiempo Digital (`/pase/[token]`):** Codificación UTF-8 Base64 URL-safe (`src/lib/passCodec.ts`), apertura animada sobre sello borgoña `GO`, mapa directo cuando no es sorpresa y descarga de evento en calendario `.ics` (`src/lib/calendarIcs.ts`).
+## Invitaciones Digitales Personalizadas (Neon Postgres + Respaldo en URL)
+- **Generador de Concierge (`/generador`):** Protegido con PIN validado en servidor (`CONCIERGE_PIN`), historial en Neon Postgres, edición sin cambiar el enlace corto, selección múltiple de fechas, Modo Sorpresa con revelación programable y envío directo por WhatsApp.
+- **Invitación Digital (`/pase/[token]`):** Enlaces cortos desde Neon (`src/db/schema.ts`, `src/lib/passRepository.ts`) con respaldo retrocompatible en Base64 URL-safe (`src/lib/passCodec.ts`), apertura animada sobre sello borgoña `GO`, mapa directo cuando no es sorpresa y guardado directo en **Google Calendar** (`src/lib/calendarIcs.ts`).
 
 ## Comandos de Desarrollo y Producción
 
 ```bash
 # Instalar dependencias
 npm install
+
+# Aplicar migraciones en Neon Postgres
+npm run db:migrate
 
 # Servidor local de desarrollo
 npm run dev
@@ -33,6 +36,6 @@ npm run dev
 npm run typecheck
 npm run lint
 
-# Build estático y de producción para Vercel
-npm run build
+# Build para Vercel (aplica migraciones si existe DATABASE_URL)
+npm run vercel-build
 ```

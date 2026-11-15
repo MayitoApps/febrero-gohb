@@ -4,7 +4,7 @@ import PassGeneratorClient from "@/components/PassGeneratorClient";
 export const metadata: Metadata = {
   title: "Generador de Invitaciones Digitales | Grupo Orgánico Hoteles Boutique",
   description:
-    "Herramienta interna de Concierge para generar enlaces personalizados de Pagaré de Tiempo Digital.",
+    "Herramienta interna de Concierge para generar y administrar invitaciones digitales personalizadas.",
   robots: {
     index: false,
     follow: false,

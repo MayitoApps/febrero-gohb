@@ -6,7 +6,6 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CalendarPlus,
-  Check,
   Compass,
   Lock,
   Luggage,
@@ -20,7 +19,7 @@ import {
 } from "lucide-react";
 import type { Experience, Hotel, PackingHints } from "@/data/hotels";
 import type { PassData } from "@/lib/passCodec";
-import { buildPassIcsContent } from "@/lib/calendarIcs";
+import { buildGoogleCalendarEvents } from "@/lib/calendarIcs";
 import { describeIsoDate, type CampaignDateDay } from "@/lib/passDates";
 
 interface DigitalPassViewProps {
@@ -84,7 +83,6 @@ export default function DigitalPassView({
   const [internalStep, setInternalStep] = useState<"sealed" | "opened">(
     "sealed"
   );
-  const [calendarSaved, setCalendarSaved] = useState(false);
   const openTrackedRef = useRef(false);
 
   const currentStep = controlledStep ?? internalStep;
@@ -120,38 +118,19 @@ export default function DigitalPassView({
     pass.dedicatoria.trim() ||
     "Casi todos celebran lo que ya fue; yo quiero apartar desde hoy el tiempo que aún nos debemos.";
 
-  const handleDownloadIcs = () => {
-    const icsContent = buildPassIcsContent(
-      {
-        ...pass,
-        folio: folioDisplay,
-        remitente: remitenteDisplay,
-        destinatario: destinatarioDisplay,
-        fechaLlegada: fechaDisplay,
-        dedicatoria: dedicatoriaDisplay,
-      },
-      packingHints,
-      hotel,
-      experiencia
-    );
-
-    const blob = new Blob([icsContent], {
-      type: "text/calendar;charset=utf-8",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    const safeFileFolio =
-      folioDisplay.replace(/[^A-Za-z0-9-_]/g, "-").toLowerCase() || "invitacion";
-    link.href = url;
-    link.download = `grupo-organico-${safeFileFolio}.ics`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    setCalendarSaved(true);
-    window.setTimeout(() => setCalendarSaved(false), 3000);
-  };
+  const googleCalendarEvents = buildGoogleCalendarEvents(
+    {
+      ...pass,
+      folio: folioDisplay,
+      remitente: remitenteDisplay,
+      destinatario: destinatarioDisplay,
+      fechaLlegada: fechaDisplay,
+      dedicatoria: dedicatoriaDisplay,
+    },
+    packingHints,
+    hotel,
+    experiencia
+  );
 
   return (
     <div
@@ -212,7 +191,7 @@ export default function DigitalPassView({
             {/* Destinatario + Sello circular borgoña GO */}
             <div className="my-8 flex flex-col items-center">
               <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-papel-algodon/60">
-                PAGARÉ DE TIEMPO DIGITAL
+                INVITACIÓN DIGITAL PERSONALIZADA
               </p>
 
               <h1
@@ -289,7 +268,7 @@ export default function DigitalPassView({
               isPreview ? "px-3 py-5" : "px-4 py-8 sm:px-6 sm:py-14"
             }`}
           >
-            {/* ESTADO 2: EL PAGARÉ DE TIEMPO EN PAPEL DE TONO EDITORIAL CÁLIDO */}
+            {/* ESTADO 2: INVITACIÓN DIGITAL EN TONO EDITORIAL CÁLIDO */}
             <article className="border border-bronce-antiguo/80 bg-papel-algodon p-1.5 text-tinta-archivo shadow-[0_30px_70px_rgba(0,0,0,0.55)] paper-texture-light">
               <div
                 className={`border border-bronce-antiguo/45 ${
@@ -589,28 +568,35 @@ export default function DigitalPassView({
                 <div className="mt-7 border-t border-tinta-archivo/15 pt-6">
                   <div
                     className={`flex flex-col gap-3 ${
-                      isPreview
+                      isPreview || googleCalendarEvents.length > 1
                         ? ""
                         : "sm:flex-row sm:items-center sm:justify-between"
                     }`}
                   >
-                    <button
-                      type="button"
-                      onClick={handleDownloadIcs}
-                      className="inline-flex flex-1 items-center justify-center gap-2.5 border border-verde-organico bg-verde-organico px-5 py-3.5 font-sans text-xs font-semibold uppercase tracking-[0.15em] text-papel-algodon transition-colors hover:border-bronce-antiguo hover:bg-tinta-archivo"
-                    >
-                      {calendarSaved ? (
-                        <>
-                          <Check className="h-4 w-4 text-bronce-antiguo" />
-                          <span>¡Fecha guardada en calendario (.ics)!</span>
-                        </>
-                      ) : (
-                        <>
-                          <CalendarPlus className="h-4 w-4 text-bronce-antiguo" />
-                          <span>Agregar fecha a mi calendario</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="flex flex-1 flex-wrap gap-2">
+                      {googleCalendarEvents.map((ev, idx) => (
+                        <a
+                          key={ev.url}
+                          href={ev.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex flex-1 items-center justify-center gap-2.5 border border-verde-organico bg-verde-organico px-5 py-3.5 font-sans text-xs font-semibold uppercase tracking-[0.15em] text-papel-algodon transition-colors hover:border-bronce-antiguo hover:bg-tinta-archivo"
+                        >
+                          <CalendarPlus className="h-4 w-4 shrink-0 text-bronce-antiguo" />
+                          <span>
+                            {googleCalendarEvents.length > 1 && ev.label
+                              ? `Google Calendar (${ev.label})`
+                              : "Agregar a Google Calendar"}
+                          </span>
+                          <ExternalLink className="h-3.5 w-3.5 shrink-0 text-bronce-antiguo/80" />
+                          {idx === 0 && (
+                            <span className="sr-only">
+                              Abre Google Calendar para guardar este evento
+                            </span>
+                          )}
+                        </a>
+                      ))}
+                    </div>
 
                     <button
                       type="button"

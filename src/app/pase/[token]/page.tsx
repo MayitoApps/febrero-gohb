@@ -33,7 +33,7 @@ function formatRevealAtCdmx(date: Date): string {
 
 export async function generateMetadata(): Promise<Metadata> {
   const title =
-    "Tienes un Pagaré de Tiempo · Grupo Orgánico Hoteles Boutique";
+    "Tienes una Invitación Digital · Grupo Orgánico Hoteles Boutique";
   const description =
     "Alguien especial apartó este 14 de febrero para escribir su próxima historia juntos.";
 
@@ -63,7 +63,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 function InvalidPassScreen({
   badge = "ENLACE NO VÁLIDO O INCOMPLETO",
-  heading = "No pudimos abrir este",
+  heading = "No pudimos abrir esta",
   body = "El enlace de invitación puede haberse copiado incompleto. Pide a quien te lo envió o a nuestro equipo de Concierge que te compartan el enlace completo.",
 }: {
   badge?: string;
@@ -78,7 +78,7 @@ function InvalidPassScreen({
         </span>
         <h1 className="mt-6 font-serif text-3xl font-normal text-papel-algodon sm:text-4xl">
           {heading}{" "}
-          <span className="italic text-bronce-antiguo">Pagaré de Tiempo</span>
+          <span className="italic text-bronce-antiguo">Invitación Digital</span>
         </h1>
         <p className="mt-4 font-sans text-sm font-light leading-relaxed text-papel-algodon/75">
           {body}
@@ -114,7 +114,7 @@ export default async function PassPage({ params }: PassPageProps) {
       return (
         <InvalidPassScreen
           badge="INVITACIÓN ANULADA O REPROGRAMADA"
-          heading="Esta invitación ya no está activa como"
+          heading="Ya no está activa esta"
           body="El folio asociado fue cancelado o reemplazado por una nueva reservación. Comunícate con quien te envió la invitación o con el Concierge de Grupo Orgánico para recibir asistencia."
         />
       );

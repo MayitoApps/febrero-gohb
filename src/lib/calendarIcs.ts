@@ -1,6 +1,7 @@
 import type { Experience, Hotel, PackingHints } from "@/data/hotels";
 import type { PassData } from "@/lib/passCodec";
 import {
+  describeIsoDate,
   groupContiguousDateSpans,
   normalizeSelectedIsoDates,
   parseIsoDateParts,
@@ -51,13 +52,28 @@ function extractCheckInHourMinute(fechaLlegada: string): {
   return { hour, minute };
 }
 
+export interface CalendarSpan {
+  startUtc: Date;
+  endUtc: Date;
+  label: string;
+}
+
+function formatSpanLabel(spanIsos: string[]): string {
+  if (spanIsos.length === 0) return "";
+  const first = describeIsoDate(spanIsos[0]);
+  const last = describeIsoDate(spanIsos[spanIsos.length - 1]);
+  if (!first || !last) return spanIsos[0];
+  if (spanIsos.length === 1 || first.iso === last.iso) {
+    return `${first.weekdayShort} ${first.dayNumber} ${first.monthShort}`;
+  }
+  return `${first.dayNumber}–${last.dayNumber} ${last.monthShort}`;
+}
+
 /**
- * Convierte fecha/hora de texto libre en uno o varios rangos UTC (CDMX UTC-6).
- * Prioriza fechasSeleccionadas si vienen en el pase; de lo contrario analiza rangos en texto.
+ * Convierte fechas seleccionadas o texto libre en uno o varios rangos UTC (CDMX UTC-6).
+ * Prioriza fechasSeleccionadas si vienen en la invitación; de lo contrario analiza rangos en texto.
  */
-function resolveCalendarSpans(
-  pass: PassData
-): Array<{ startUtc: Date; endUtc: Date }> {
+export function resolveCalendarSpans(pass: PassData): CalendarSpan[] {
   const { hour: localHour, minute } = extractCheckInHourMinute(
     pass.fechaLlegada
   );
@@ -83,6 +99,7 @@ function resolveCalendarSpans(
         return {
           startUtc,
           endUtc: new Date(startUtc.getTime() + 3 * 60 * 60 * 1000),
+          label: formatSpanLabel(span),
         };
       }
 
@@ -96,11 +113,12 @@ function resolveCalendarSpans(
           endUtc > startUtc
             ? endUtc
             : new Date(startUtc.getTime() + 24 * 60 * 60 * 1000),
+        label: formatSpanLabel(span),
       };
     });
   }
 
-  // Fallback para tokens antiguos o texto libre (detectando también "12 al 14")
+  // Fallback para invitaciones anteriores o texto libre (detectando también "12 al 14")
   const lower = pass.fechaLlegada.toLowerCase();
   const yearMatch = lower.match(/\b(202[6-9])\b/);
   const year = yearMatch ? Number(yearMatch[1]) : 2027;
@@ -127,26 +145,24 @@ function resolveCalendarSpans(
 
   if (endDay && endDay > startDay) {
     const endUtc = new Date(Date.UTC(year, month - 1, endDay, 14 + 6, 0, 0));
-    return [{ startUtc, endUtc }];
+    return [{ startUtc, endUtc, label: "" }];
   }
 
   return [
     {
       startUtc,
       endUtc: new Date(startUtc.getTime() + 3 * 60 * 60 * 1000),
+      label: "",
     },
   ];
 }
 
-export function buildPassIcsContent(
+function buildCalendarEventMetadata(
   pass: PassData,
   packingHints: PackingHints,
   hotel?: Hotel | null,
   experiencia?: Experience | null
-): string {
-  const spans = resolveCalendarSpans(pass);
-  const nowUtc = new Date();
-
+) {
   const isSecret = pass.destinoSecreto || !hotel || !experiencia;
 
   const summary = isSecret
@@ -157,7 +173,7 @@ export function buildPassIcsContent(
     ? "Destino Confidencial · Por revelar al viajar"
     : hotel.direccionExacta;
 
-  const rawDescription = isSecret
+  const description = isSecret
     ? [
         `Folio: ${pass.folio}`,
         `De: ${pass.remitente} para ${pass.destinatario}`,
@@ -171,6 +187,66 @@ export function buildPassIcsContent(
         `Dirección: ${hotel.direccionExacta}`,
       ].join("\n");
 
+  return { summary, location, description };
+}
+
+export interface GoogleCalendarEventLink {
+  label: string;
+  url: string;
+}
+
+/**
+ * Genera enlaces directos para guardar el evento en Google Calendar.
+ * Devuelve un enlace por cada rango continuo (normalmente 1 para fin de semana o día único).
+ */
+export function buildGoogleCalendarEvents(
+  pass: PassData,
+  packingHints: PackingHints,
+  hotel?: Hotel | null,
+  experiencia?: Experience | null
+): GoogleCalendarEventLink[] {
+  const spans = resolveCalendarSpans(pass);
+  const { summary, location, description } = buildCalendarEventMetadata(
+    pass,
+    packingHints,
+    hotel,
+    experiencia
+  );
+
+  return spans.map((span) => {
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: summary,
+      dates: `${formatUtcTimestamp(span.startUtc)}/${formatUtcTimestamp(
+        span.endUtc
+      )}`,
+      details: description,
+      location,
+      ctz: "America/Mexico_City",
+    });
+
+    return {
+      label: span.label,
+      url: `https://calendar.google.com/calendar/render?${params.toString()}`,
+    };
+  });
+}
+
+export function buildPassIcsContent(
+  pass: PassData,
+  packingHints: PackingHints,
+  hotel?: Hotel | null,
+  experiencia?: Experience | null
+): string {
+  const spans = resolveCalendarSpans(pass);
+  const nowUtc = new Date();
+  const { summary, location, description } = buildCalendarEventMetadata(
+    pass,
+    packingHints,
+    hotel,
+    experiencia
+  );
+
   const uidSafe =
     pass.folio.replace(/[^A-Za-z0-9-]/g, "").toLowerCase() || "go-2027";
 
@@ -182,7 +258,7 @@ export function buildPassIcsContent(
     `DTEND:${formatUtcTimestamp(span.endUtc)}`,
     `SUMMARY:${escapeIcsText(summary)}`,
     `LOCATION:${escapeIcsText(location)}`,
-    `DESCRIPTION:${escapeIcsText(rawDescription)}`,
+    `DESCRIPTION:${escapeIcsText(description)}`,
     "STATUS:CONFIRMED",
     "END:VEVENT",
   ]);

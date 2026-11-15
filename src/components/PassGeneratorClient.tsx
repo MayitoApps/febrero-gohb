@@ -726,7 +726,7 @@ export default function PassGeneratorClient() {
             <h1 className="mt-1 font-serif text-2xl font-normal text-papel-algodon sm:text-3xl">
               Generador de{" "}
               <span className="italic text-bronce-antiguo">
-                Pagaré de Tiempo Digital
+                Invitación Digital
               </span>
             </h1>
           </div>
@@ -1446,7 +1446,7 @@ export default function PassGeneratorClient() {
                         : "text-papel-algodon/75 hover:text-papel-algodon"
                     }`}
                   >
-                    Pagaré abierto
+                    Invitación abierta
                   </button>
                 </div>
               </div>

@@ -190,12 +190,8 @@ export default function DigitalPassView({
 
             {/* Destinatario + Sello circular borgoña GO */}
             <div className="my-8 flex flex-col items-center">
-              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-papel-algodon/60">
-                INVITACIÓN DIGITAL PERSONALIZADA
-              </p>
-
               <h1
-                className={`mt-3 font-serif font-normal italic leading-tight text-papel-algodon ${
+                className={`font-serif font-normal italic leading-tight text-papel-algodon ${
                   isPreview ? "text-3xl sm:text-4xl" : "text-4xl sm:text-6xl"
                 }`}
               >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,6 +21,7 @@ import {
 import type { Experience, Hotel, PackingHints } from "@/data/hotels";
 import type { PassData } from "@/lib/passCodec";
 import { buildPassIcsContent } from "@/lib/calendarIcs";
+import { describeIsoDate, type CampaignDateDay } from "@/lib/passDates";
 
 interface DigitalPassViewProps {
   pass: PassData;
@@ -31,6 +32,42 @@ interface DigitalPassViewProps {
   controlledStep?: "sealed" | "opened";
   onStepChange?: (step: "sealed" | "opened") => void;
   isPreview?: boolean;
+  /** Identificador en Neon Postgres para registrar apertura del sello */
+  passSlug?: string;
+  /** Texto formateado cuando el destino secreto tiene fecha de revelación automática */
+  revealAtLabel?: string | null;
+}
+
+function SelectedDatesRow({
+  dates,
+  compact = false,
+}: {
+  dates: CampaignDateDay[];
+  compact?: boolean;
+}) {
+  if (dates.length === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      className={`flex flex-wrap ${compact ? "mt-2.5 gap-1.5" : "mt-3 gap-2"}`}
+    >
+      {dates.map((day) => (
+        <span
+          key={day.iso}
+          className={`inline-flex items-center border border-bronce-antiguo/45 bg-verde-organico/35 font-mono text-[10px] uppercase tracking-widest text-papel-algodon/90 ${
+            compact ? "gap-1 px-2 py-0.5" : "gap-1.5 px-2.5 py-1"
+          }`}
+        >
+          <span className="text-bronce-antiguo">{day.weekdayShort}</span>
+          <span>
+            {day.dayNumber} {day.monthShort}
+          </span>
+        </span>
+      ))}
+    </div>
+  );
 }
 
 export default function DigitalPassView({
@@ -41,14 +78,26 @@ export default function DigitalPassView({
   controlledStep,
   onStepChange,
   isPreview = false,
+  passSlug,
+  revealAtLabel = null,
 }: DigitalPassViewProps) {
   const [internalStep, setInternalStep] = useState<"sealed" | "opened">(
     "sealed"
   );
   const [calendarSaved, setCalendarSaved] = useState(false);
+  const openTrackedRef = useRef(false);
 
   const currentStep = controlledStep ?? internalStep;
   const setStep = (next: "sealed" | "opened") => {
+    if (next === "opened" && !isPreview && passSlug && !openTrackedRef.current) {
+      openTrackedRef.current = true;
+      void fetch(`/api/passes/${encodeURIComponent(passSlug)}/open`, {
+        method: "POST",
+      }).catch(() => {
+        // Ignorar errores silenciosamente para no afectar la experiencia del invitado
+      });
+    }
+
     if (onStepChange) {
       onStepChange(next);
     } else {
@@ -61,6 +110,12 @@ export default function DigitalPassView({
   const folioDisplay = pass.folio.trim() || "GO-2027-014";
   const fechaDisplay =
     pass.fechaLlegada.trim() || "Viernes 12 de Febrero 2027 · 15:00 hrs";
+  const selectedDateBadges: CampaignDateDay[] = (
+    pass.fechasSeleccionadas ?? []
+  )
+    .map((iso) => describeIsoDate(iso))
+    .filter((item): item is CampaignDateDay => item !== null);
+  const hasMultipleDates = selectedDateBadges.length > 1;
   const dedicatoriaDisplay =
     pass.dedicatoria.trim() ||
     "Casi todos celebran lo que ya fue; yo quiero apartar desde hoy el tiempo que aún nos debemos.";
@@ -346,14 +401,18 @@ export default function DigitalPassView({
                           DESTINO CONFIDENCIAL · REVELACIÓN AL VIAJAR
                         </span>
                         <span className="font-mono text-[10px] uppercase tracking-widest text-bronce-antiguo">
-                          MODO SORPRESA ACTIVO
+                          {revealAtLabel
+                            ? `REVELACIÓN · ${revealAtLabel}`
+                            : "MODO SORPRESA ACTIVO"}
                         </span>
                       </div>
 
-                      {/* Fecha y hora en que deben estar listos */}
+                      {/* Fecha(s) y hora en que deben estar listos */}
                       <div className="mt-5 border-b border-bronce-antiguo/20 pb-5">
                         <p className="font-mono text-[10px] uppercase tracking-widest text-bronce-antiguo">
-                          FECHA Y HORA EN QUE DEBEN ESTAR LISTOS
+                          {hasMultipleDates
+                            ? "FECHAS Y HORA EN QUE DEBEN ESTAR LISTOS"
+                            : "FECHA Y HORA EN QUE DEBEN ESTAR LISTOS"}
                         </p>
                         <p
                           className={`mt-1 font-serif font-normal text-papel-algodon ${
@@ -362,6 +421,7 @@ export default function DigitalPassView({
                         >
                           {fechaDisplay}
                         </p>
+                        <SelectedDatesRow dates={selectedDateBadges} />
                       </div>
 
                       {/* Pistas de Equipaje (Sin revelar el lugar) */}
@@ -487,11 +547,17 @@ export default function DigitalPassView({
                         >
                           <div>
                             <p className="font-mono text-[10px] uppercase tracking-widest text-bronce-antiguo">
-                              FECHA Y HORA DE LLEGADA
+                              {hasMultipleDates
+                                ? "FECHAS Y HORA DE ESTANCIA / LLEGADA"
+                                : "FECHA Y HORA DE LLEGADA"}
                             </p>
                             <p className="mt-1 font-sans text-sm font-medium text-papel-algodon">
                               {fechaDisplay}
                             </p>
+                            <SelectedDatesRow
+                              dates={selectedDateBadges}
+                              compact
+                            />
                           </div>
                           <div>
                             <p className="font-mono text-[10px] uppercase tracking-widest text-bronce-antiguo">

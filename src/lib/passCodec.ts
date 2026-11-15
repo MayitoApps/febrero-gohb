@@ -1,4 +1,5 @@
 import { getHotelBySlug, type Experience, type Hotel } from "@/data/hotels";
+import { normalizeSelectedIsoDates } from "@/lib/passDates";
 
 export interface PassData {
   folio: string;
@@ -7,6 +8,7 @@ export interface PassData {
   hotelSlug: string;
   experienciaIndex: 0 | 1;
   fechaLlegada: string;
+  fechasSeleccionadas?: string[];
   dedicatoria: string;
   destinoSecreto: boolean;
 }
@@ -40,6 +42,10 @@ function base64UrlToBytes(token: string): Uint8Array {
  * Codifica un objeto PassData en un token Base64 URL-safe compatible con UTF-8.
  */
 export function encodePassToken(data: PassData): string {
+  const normalizedDates = Array.isArray(data.fechasSeleccionadas)
+    ? normalizeSelectedIsoDates(data.fechasSeleccionadas)
+    : [];
+
   const payload: PassData = {
     folio: data.folio.trim(),
     remitente: data.remitente.trim(),
@@ -50,6 +56,10 @@ export function encodePassToken(data: PassData): string {
     dedicatoria: data.dedicatoria.trim(),
     destinoSecreto: Boolean(data.destinoSecreto),
   };
+
+  if (normalizedDates.length > 0) {
+    payload.fechasSeleccionadas = normalizedDates;
+  }
 
   const json = JSON.stringify(payload);
   const bytes = new TextEncoder().encode(json);
@@ -92,6 +102,12 @@ export function decodePassToken(token: string): PassData | null {
     }
 
     const expIdx: 0 | 1 = candidate.experienciaIndex === 1 ? 1 : 0;
+    const rawDates = Array.isArray(candidate.fechasSeleccionadas)
+      ? candidate.fechasSeleccionadas.filter(
+          (item): item is string => typeof item === "string"
+        )
+      : [];
+    const normalizedDates = normalizeSelectedIsoDates(rawDates);
 
     return {
       folio: candidate.folio,
@@ -100,6 +116,9 @@ export function decodePassToken(token: string): PassData | null {
       hotelSlug: candidate.hotelSlug,
       experienciaIndex: expIdx,
       fechaLlegada: candidate.fechaLlegada,
+      ...(normalizedDates.length > 0
+        ? { fechasSeleccionadas: normalizedDates }
+        : {}),
       dedicatoria: candidate.dedicatoria,
       destinoSecreto: Boolean(candidate.destinoSecreto),
     };
